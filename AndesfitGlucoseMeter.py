@@ -1,8 +1,8 @@
 import pygatt
 
-import logging
-logging.basicConfig()
-logging.getLogger('pygatt').setLevel(logging.DEBUG)
+#import logging
+#logging.basicConfig()
+#logging.getLogger('pygatt').setLevel(logging.DEBUG)
 
 def handleData(handle, value):
     if len(value) == 12:
@@ -22,10 +22,14 @@ try:
                 device = adapter.connect(discover['address'], address_type=pygatt.BLEAddressType.random) # ADF Type Random
                 print('Connected with device')
 
+                # ADF Write Characteristics, set up date time
                 device.char_write_handle(0x21, [0x5A, 0x0A, 0x00, 0x14, 0x0F, 0x05, 0x09, 0x05, 0x01, 0x9D], True)
+                # ADF Notify Characteristics, 0x24 handle FFF4 + 2
                 device.char_write_handle(0x26, [0x01, 0x00], True)                
+                print('Write successfully')
 
                 while True:
+                    # Subcribe value handle + 2
                     device.subscribe_handle_two('0000fff4-0000-1000-8000-00805f9b34fb', callback=handleData)
 
             except KeyboardInterrupt:
